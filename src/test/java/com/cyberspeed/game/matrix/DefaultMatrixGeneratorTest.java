@@ -34,17 +34,17 @@ class DefaultMatrixGeneratorTest {
         for (Cell cell : symbolProbabilityWeightByCell.keySet()) {
             List<SymbolProbability> sortedSymbolProbabilitiesByProbability = Stream.concat(
                             symbolProbabilitiesByCell.get(cell).stream()
-                                            .map(v -> new SymbolProbability(v.getSymbolName(), v.getProbability() * columns * rows)),
+                                            .map(v -> new SymbolProbability(v.symbolName(), v.probability() * columns * rows)),
                             symbolProbabilitiesAcrossMatrix.stream()
                     )
-                    .sorted(Comparator.comparing(SymbolProbability::getProbability))
+                    .sorted(Comparator.comparing(SymbolProbability::probability))
                     .toList();
 
             List<String> symbolsOrderedByWeight = new ArrayList<>(symbolProbabilityWeightByCell.get(cell).values());
 
             Assertions.assertEquals(sortedSymbolProbabilitiesByProbability.size(), symbolsOrderedByWeight.size());
             for (int i = 0; i < sortedSymbolProbabilitiesByProbability.size(); i++) {
-                Assertions.assertEquals(sortedSymbolProbabilitiesByProbability.get(i).getSymbolName(), symbolsOrderedByWeight.get(i));
+                Assertions.assertEquals(sortedSymbolProbabilitiesByProbability.get(i).symbolName(), symbolsOrderedByWeight.get(i));
             }
 
         }

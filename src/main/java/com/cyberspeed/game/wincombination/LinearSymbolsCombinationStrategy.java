@@ -24,7 +24,7 @@ public class LinearSymbolsCombinationStrategy implements WinCombinationStrategy 
         for (Cell[] row : coveredAreas) {
             combinationApplied = true;
             for (Cell cell : row) {
-                if (!symbolName.equalsIgnoreCase(matrix[cell.rowIndex][cell.columnIndex])) {
+                if (!symbolName.equalsIgnoreCase(matrix[cell.rowIndex()][cell.columnIndex()])) {
                     combinationApplied = false;
                     break;
                 }

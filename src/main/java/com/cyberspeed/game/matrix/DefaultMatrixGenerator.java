@@ -58,15 +58,15 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
 
             long index = 0;
             for (SymbolProbability symbolProbability : symbolProbabilitiesAcrossMatrix){
-                int probability = symbolProbability.getProbability();
+                int probability = symbolProbability.probability();
                 index += probability;
-                symbolByProbability.put(index, symbolProbability.getSymbolName());
+                symbolByProbability.put(index, symbolProbability.symbolName());
             }
 
             for (SymbolProbability symbolProbability : symbolProbabilitiesByCellEntry.getValue()){
-                int probability = symbolProbability.getProbability() * rows * columns;
+                int probability = symbolProbability.probability() * rows * columns;
                 index += probability;
-                symbolByProbability.put(index, symbolProbability.getSymbolName());
+                symbolByProbability.put(index, symbolProbability.symbolName());
             }
 
             symbolProbabilityAcrossByCell.put(symbolProbabilitiesByCellEntry.getKey(), symbolByProbability);
