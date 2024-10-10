@@ -3,6 +3,7 @@ package com.cyberspeed.game.matrix;
 import com.cyberspeed.game.probability.SymbolProbability;
 
 import java.util.*;
+import java.util.random.RandomGenerator;
 
 import static java.util.Objects.requireNonNull;
 
@@ -11,17 +12,22 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
     private final int columns;
     private final int rows;
 
+    private final RandomGenerator randomGenerator;
+
     final Map<Cell, TreeMap<Long, String>> symbolProbabilityWeightByCell;
 
     private DefaultMatrixGenerator(int columns,
                                    int rows,
                                    Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell,
-                                   List<SymbolProbability> symbolProbabilitiesAcrossMatrix) {
+                                   List<SymbolProbability> symbolProbabilitiesAcrossMatrix,
+                                   Optional<RandomGenerator> randomGenerator) {
         if(columns <= 0) throw new IllegalArgumentException("Columns number must be bigger then Zero");
         if(rows <= 0) throw new IllegalArgumentException("Rows number must be bigger then Zero");
 
         this.columns = columns;
         this.rows = rows;
+
+        this.randomGenerator = randomGenerator.orElse(new SplittableRandom());
 
         validate(columns, rows, symbolProbabilitiesByCell, symbolProbabilitiesAcrossMatrix);
         symbolProbabilityWeightByCell = buildSymbolProbabilityWeightByCellDetails(columns, rows, symbolProbabilitiesByCell, symbolProbabilitiesAcrossMatrix);
@@ -77,13 +83,12 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
 
     public String[][] generateMatrix() {
         String[][] matrix = new String[rows][columns];
-        SplittableRandom random = new SplittableRandom();
 
         for (int row = 0; row < rows; row++) {
             for (int column = 0; column < columns; column++) {
                 TreeMap<Long, String> symbolsByProbability = symbolProbabilityWeightByCell.get(new Cell(row, column));
 
-                long probabilityIndex = random.nextLong(symbolsByProbability.lastKey());
+                long probabilityIndex = randomGenerator.nextLong(symbolsByProbability.lastKey()) + 1;
                 matrix[row][column] = symbolsByProbability.ceilingEntry(probabilityIndex).getValue();
             }
         }
@@ -100,6 +105,7 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
         private int rows;
         private Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell;
         private List<SymbolProbability> symbolProbabilitiesAcrossMatrix;
+        private Optional<RandomGenerator> randomGenerator = Optional.empty();
 
         public Builder setColumns(int columns) {
             this.columns = columns;
@@ -121,8 +127,13 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
             return this;
         }
 
+        public Builder setRandomGenerator(RandomGenerator randomGenerator) {
+            this.randomGenerator = Optional.of(randomGenerator);
+            return this;
+        }
+
         public DefaultMatrixGenerator build() {
-            return new DefaultMatrixGenerator(columns, rows, symbolProbabilitiesByCell, symbolProbabilitiesAcrossMatrix);
+            return new DefaultMatrixGenerator(columns, rows, symbolProbabilitiesByCell, symbolProbabilitiesAcrossMatrix, randomGenerator);
         }
     }
 

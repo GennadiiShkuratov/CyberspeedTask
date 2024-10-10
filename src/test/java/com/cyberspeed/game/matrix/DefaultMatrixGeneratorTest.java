@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,75 @@ class DefaultMatrixGeneratorTest {
             }
 
         }
+    }
+
+    @Test
+    void probabilityOfSymbolShouldReflectedInSymbolWeight(){
+        //Given
+        RandomGenerator randomGenerator = new RandomGenerator() {
+            int counter;
+            int[] weight = new int[]{0, 1, 2, 3, 20, 21, 65, 66, 155};
+
+            @Override
+            public long nextLong() {
+                return 0;
+            }
+
+            @Override
+            public long nextLong(long bound ) {
+                return weight[counter++];
+            }
+        };
+
+        List<SymbolProbability> symbolProbabilities = new ArrayList<>();
+        symbolProbabilities.add(new SymbolProbability("A", 2));//21
+        symbolProbabilities.add(new SymbolProbability("B", 5));//66
+        symbolProbabilities.add(new SymbolProbability("C", 10));//156
+
+        Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell = new HashMap<>();
+        symbolProbabilitiesByCell.put(new Cell(0, 0), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(0, 1), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(0, 2), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(1, 0), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(1, 1), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(1, 2), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(2, 0), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(2, 1), symbolProbabilities);
+        symbolProbabilitiesByCell.put(new Cell(2, 2), symbolProbabilities);
+
+        List<SymbolProbability> symbolProbabilitiesAcrossMatrix = new ArrayList<>();
+        symbolProbabilitiesAcrossMatrix.add(new SymbolProbability("10x", 1));//1
+        symbolProbabilitiesAcrossMatrix.add(new SymbolProbability("5x", 2));//3
+
+        int rows = 3;
+        int columns = 3;
+
+        DefaultMatrixGenerator matrixGenerator = DefaultMatrixGenerator.builder()
+                .setRows(rows)
+                .setColumns(columns)
+                .setSymbolProbabilitiesAcrossMatrix(symbolProbabilitiesAcrossMatrix)
+                .setSymbolProbabilitiesByCell(symbolProbabilitiesByCell)
+                .setRandomGenerator(randomGenerator)
+                .build();
+
+        //When
+        String[][] matrix = matrixGenerator.generateMatrix();
+
+        //Then
+        System.out.println(Arrays.deepToString(matrix));
+
+       Assertions.assertEquals("10X", matrix[0][0]);
+       Assertions.assertEquals("5X", matrix[0][1]);
+       Assertions.assertEquals("5X", matrix[0][2]);
+
+       Assertions.assertEquals("A", matrix[1][0]);
+       Assertions.assertEquals("A", matrix[1][1]);
+       Assertions.assertEquals("B", matrix[1][2]);
+
+       Assertions.assertEquals("B", matrix[2][0]);
+       Assertions.assertEquals("C", matrix[2][1]);
+       Assertions.assertEquals("C", matrix[2][2]);
+
     }
 
     @Test
