@@ -1,4 +1,4 @@
-package com.cyberspeed.game.winCombination;
+package com.cyberspeed.game.wincombination;
 
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.symbol.StandardSymbol;
@@ -18,13 +18,12 @@ public class LinearSymbolsCombinationStrategy implements WinCombinationStrategy 
 
     @Override
     public boolean isApplicable(StandardSymbol standardSymbol, String[][] matrix) {
-        String symbolName = standardSymbol.getName();
+        String symbolName = standardSymbol.name();
 
         boolean combinationApplied;
-        for (int i = 0; i < coveredAreas.length; i++) {
+        for (Cell[] row : coveredAreas) {
             combinationApplied = true;
-            for (int j = 0; j < coveredAreas[i].length; j++) {
-                Cell cell = coveredAreas[i][j];
+            for (Cell cell : row) {
                 if (!symbolName.equalsIgnoreCase(matrix[cell.rowIndex][cell.columnIndex])) {
                     combinationApplied = false;
                     break;

@@ -1,10 +1,9 @@
 package com.cyberspeed.game;
 
 import com.cyberspeed.game.matrix.MatrixGenerator;
-import com.cyberspeed.game.probability.SymbolProbability;
 import com.cyberspeed.game.symbol.BonusSymbol;
 import com.cyberspeed.game.symbol.StandardSymbol;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.wincombination.WinCombination;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -15,10 +14,10 @@ import static java.util.stream.Collectors.*;
 
 public class ScratchGame implements Game {
 
-    final private Map<String, StandardSymbol> standardSymbolsByName;
-    final private Map<String, BonusSymbol> bonusSymbolsByName;
-    final private List<WinCombination> winCombinations;
-    final private MatrixGenerator matrixGenerator;
+    private final Map<String, StandardSymbol> standardSymbolsByName;
+    private final Map<String, BonusSymbol> bonusSymbolsByName;
+    private final List<WinCombination> winCombinations;
+    private final MatrixGenerator matrixGenerator;
 
     private ScratchGame(List<StandardSymbol> standardSymbols,
                         List<BonusSymbol> bonusSymbols,
@@ -26,7 +25,7 @@ public class ScratchGame implements Game {
                         MatrixGenerator matrixGenerator) {
         this.standardSymbolsByName = requireNonNull(standardSymbols).stream()
                 .collect(collectingAndThen(
-                        toMap(v -> v.getName(), identity()),
+                        toMap(StandardSymbol::name, identity()),
                         Collections::unmodifiableMap
                 ));
 
@@ -36,7 +35,7 @@ public class ScratchGame implements Game {
 
         this.bonusSymbolsByName = requireNonNull(bonusSymbols).stream()
                 .collect(collectingAndThen(
-                        toMap(v -> v.getName(), identity()),
+                        toMap(NamedObject::name, identity()),
                         Collections::unmodifiableMap
                 ));
 
@@ -52,7 +51,17 @@ public class ScratchGame implements Game {
         }
 
         String[][] matrix = matrixGenerator.generateMatrix();
+        Reward reward = calculateRewardFromSymbolCombinations(bettingAmount, matrix);
 
+        List<BonusSymbol> allBonusSymbols = getAllBonusSymbols(matrix);
+        if (!allBonusSymbols.isEmpty()) {
+            reward = reward.addBonusSymbols(allBonusSymbols);
+        }
+
+        return reward;
+    }
+
+    private Reward calculateRewardFromSymbolCombinations(BigDecimal bettingAmount, String[][] matrix) {
         Reward reward = Reward.emptyReward(bettingAmount, matrix);
 
         for (StandardSymbol symbol : standardSymbolsByName.values()) {
@@ -72,19 +81,16 @@ public class ScratchGame implements Game {
                     : reward.addWinCombinations(symbol, new ArrayList<>(multiplierByWinCombinationGroup.values()));
         }
 
-        List<BonusSymbol> allBonusSymbols = getAllBonusSymbols(matrix);
-        reward = allBonusSymbols.isEmpty() ? reward : reward.addBonusSymbols(allBonusSymbols);
-
         return reward;
     }
 
     private List<BonusSymbol> getAllBonusSymbols(String[][] matrix) {
         return Arrays.stream(matrix)
                 .flatMap((Arrays::stream))
-                .map(v -> bonusSymbolsByName.get(v))
+                .map(bonusSymbolsByName::get)
                 .filter(Objects::nonNull)
                 .map(BonusSymbol.class::cast)
-                .collect(toList());
+                .toList();
 
     }
 

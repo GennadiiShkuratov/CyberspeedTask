@@ -3,21 +3,21 @@ package com.cyberspeed.game;
 import com.cyberspeed.game.bonus.Bonus;
 import com.cyberspeed.game.symbol.BonusSymbol;
 import com.cyberspeed.game.symbol.StandardSymbol;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.wincombination.WinCombination;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
+import static com.cyberspeed.game.Utils.roundToWholeNumber;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.requireNonNull;
 
 public class Reward {
 
-    final private String[][] matrix;
-    final private BigDecimal bettingAmount;
-    final private Map<StandardSymbol, List<WinCombination>> winCombinations;
-    final private List<BonusSymbol> bonusSymbols;
+    private final String[][] matrix;
+    private final BigDecimal bettingAmount;
+    private final Map<StandardSymbol, List<WinCombination>> winCombinations;
+    private final List<BonusSymbol> bonusSymbols;
 
     private Reward(String[][] matrix,
                    BigDecimal bettingAmount,
@@ -44,6 +44,19 @@ public class Reward {
                 .setWinCombinations(Collections.emptyMap())
                 .setBonusSymbols(Collections.emptyList())
                 .build();
+    }
+
+    public BigDecimal calculateTotalReward() {
+        Bonus bonus = Bonus.generateFrom(bonusSymbols);
+
+        if (bonus.missGameStatus()) return ZERO;
+
+        BigDecimal baseReward = winCombinations.entrySet().stream()
+                .map(this::accumulateWinCombinations)
+                .reduce(ZERO, BigDecimal::add);
+
+        BigDecimal totalReward = bonus.applyToReward(baseReward);
+        return roundToWholeNumber(totalReward);
     }
 
     public Reward addBonusSymbols(List<BonusSymbol> bonusSymbols){
@@ -73,25 +86,12 @@ public class Reward {
                 .build();
     }
 
-    public BigDecimal calculateTotalReward() {
-        Bonus bonus = Bonus.generateFrom(bonusSymbols);
-
-        if (bonus.missGameStatus()) return ZERO;
-
-        BigDecimal baseReward = winCombinations.entrySet().stream()
-                .map(this::accumulateWinCombinations)
-                .reduce(ZERO, BigDecimal::add);
-
-        BigDecimal totalReward = bonus.applyToReward(baseReward);
-        return totalReward.setScale(0, RoundingMode.FLOOR);
-    }
-
     private BigDecimal accumulateWinCombinations(Map.Entry<StandardSymbol, List<WinCombination>> symbolWinCombinations) {
-        BigDecimal symbolMultiplier = symbolWinCombinations.getKey().getMultiplier();
+        BigDecimal symbolMultiplier = symbolWinCombinations.getKey().multiplier();
 
         return symbolWinCombinations.getValue().stream()
                 .map(WinCombination::getMultiplier)
-                .reduce(bettingAmount, (v1, v2) -> v1.multiply(v2))
+                .reduce(bettingAmount, BigDecimal::multiply)
                 .multiply(symbolMultiplier);
     }
 

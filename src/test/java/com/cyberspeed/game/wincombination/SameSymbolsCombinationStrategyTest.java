@@ -1,4 +1,4 @@
-package com.cyberspeed.game.winCombination;
+package com.cyberspeed.game.wincombination;
 
 import com.cyberspeed.game.symbol.StandardSymbol;
 import org.junit.jupiter.api.Assertions;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 class SameSymbolsCombinationStrategyTest {
 
     @Test
-    public void applySameSymbolsStrategyIfSymbolsCountCorrespondToCombination(){
+    void applySameSymbolsStrategyIfSymbolsCountCorrespondToCombination(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "B", "A"},
@@ -32,7 +32,7 @@ class SameSymbolsCombinationStrategyTest {
     }
 
     @Test
-    public void strategyIsNotApplicableWhenSymbolsCountLessThenExpected(){
+    void strategyIsNotApplicableWhenSymbolsCountLessThenExpected(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "B", "A"},

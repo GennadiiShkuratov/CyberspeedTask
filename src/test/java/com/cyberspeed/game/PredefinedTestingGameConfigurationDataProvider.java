@@ -3,9 +3,9 @@ package com.cyberspeed.game;
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.probability.SymbolProbability;
 import com.cyberspeed.game.symbol.*;
-import com.cyberspeed.game.winCombination.LinearSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.SameSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.wincombination.LinearSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.SameSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.WinCombination;
 
 import java.math.BigDecimal;
 import java.util.*;

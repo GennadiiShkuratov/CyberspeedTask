@@ -1,4 +1,4 @@
-package com.cyberspeed.game.winCombination;
+package com.cyberspeed.game.wincombination;
 
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.symbol.StandardSymbol;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 class LinearSymbolsCombinationStrategyTest {
 
     @Test
-    public void applyHorizontalLinearSymbolsStrategyIfAtLeastOneSymbolsLineMapped(){
+    void applyHorizontalLinearSymbolsStrategyIfAtLeastOneSymbolsLineMapped(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "A"},
@@ -38,7 +38,7 @@ class LinearSymbolsCombinationStrategyTest {
 
 
     @Test
-    public void strategyIsNotApplicableWhenNoneOfLinesMappedToSpecificSymbol(){
+    void strategyIsNotApplicableWhenNoneOfLinesMappedToSpecificSymbol(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "B"},
@@ -65,7 +65,7 @@ class LinearSymbolsCombinationStrategyTest {
     }
 
     @Test
-    public void coveredAreasCanHaveDifferentSizeOfVerticalLines(){
+    void coveredAreasCanHaveDifferentSizeOfVerticalLines(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "B"},
@@ -90,7 +90,7 @@ class LinearSymbolsCombinationStrategyTest {
     }
 
     @Test
-    public void coveredAreasCanHaveDifferentSizeOfHorizontalLines(){
+    void coveredAreasCanHaveDifferentSizeOfHorizontalLines(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"B", "A", "A"},
@@ -117,7 +117,7 @@ class LinearSymbolsCombinationStrategyTest {
 
 
     @Test
-    public void coveredAreasCanHaveDifferentSizeOfDiagonalLines(){
+    void coveredAreasCanHaveDifferentSizeOfDiagonalLines(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"B", "A", "B"},

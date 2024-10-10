@@ -2,13 +2,12 @@ package com.cyberspeed.game;
 
 import com.cyberspeed.game.configuration.GameConfiguration;
 import com.cyberspeed.game.configuration.GameConfigurationValidationException;
-import com.cyberspeed.game.configuration.SymbolsProbabilityValidationStrategy;
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.matrix.MatrixGenerator;
 import com.cyberspeed.game.symbol.BonusSymbol;
 import com.cyberspeed.game.symbol.StandardSymbol;
-import com.cyberspeed.game.winCombination.LinearSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.wincombination.LinearSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.WinCombination;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +17,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -26,7 +24,7 @@ import static java.util.Collections.emptyList;
 class ScratchGameTest {
 
     @Test
-    public void oneWinCombinationFromSameGroupShouldBeApplied() {
+    void oneWinCombinationFromSameGroupShouldBeApplied() {
         //Given
         List<StandardSymbol> standardSymbols = new ArrayList<>();
         standardSymbols.add(new StandardSymbol("A", BigDecimal.valueOf(2)));
@@ -81,7 +79,7 @@ class ScratchGameTest {
     }
 
     @Test
-    public void rewardByFSymbolUsing3SameSymbolsCombinationAndExtra500() throws URISyntaxException, GameConfigurationValidationException {
+    void rewardByFSymbolUsing3SameSymbolsCombinationAndExtra500() throws URISyntaxException, GameConfigurationValidationException {
         //Given
         URL resource = getClass().getClassLoader().getResource("json/config.json");
         File configFile = Paths.get(resource.toURI()).toFile();
@@ -116,7 +114,7 @@ class ScratchGameTest {
     }
 
     @Test
-    public void rewardByESymbolUsing3SameSymbolsCombinationAndFSymbolUsing3SameSymbolsCombination() throws URISyntaxException, GameConfigurationValidationException {
+    void rewardByESymbolUsing3SameSymbolsCombinationAndFSymbolUsing3SameSymbolsCombination() throws URISyntaxException, GameConfigurationValidationException {
         //Given
         URL resource = getClass().getClassLoader().getResource("json/config.json");
         File configFile = Paths.get(resource.toURI()).toFile();

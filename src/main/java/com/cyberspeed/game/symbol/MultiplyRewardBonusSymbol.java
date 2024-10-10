@@ -6,14 +6,14 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import static com.cyberspeed.game.Utils.round;
-import static com.cyberspeed.game.bonus.GameImpact.MISS_GAME;
 import static com.cyberspeed.game.bonus.GameImpact.INCREASE_REWARD;
+import static com.cyberspeed.game.bonus.GameImpact.MISS_GAME;
 import static java.util.Objects.requireNonNull;
 
 public class MultiplyRewardBonusSymbol implements BonusSymbol {
 
     private final String name;
-    private BigDecimal multiplier;
+    private final BigDecimal multiplier;
 
     public MultiplyRewardBonusSymbol(String name, BigDecimal multiplier) {
         this.name = requireNonNull(name).toUpperCase();
@@ -34,7 +34,7 @@ public class MultiplyRewardBonusSymbol implements BonusSymbol {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 

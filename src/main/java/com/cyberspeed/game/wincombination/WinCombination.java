@@ -1,4 +1,4 @@
-package com.cyberspeed.game.winCombination;
+package com.cyberspeed.game.wincombination;
 
 import com.cyberspeed.game.NamedObject;
 import com.cyberspeed.game.symbol.StandardSymbol;
@@ -29,7 +29,7 @@ public class WinCombination implements NamedObject {
         return strategy.isApplicable(standardSymbol, matrix);
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 

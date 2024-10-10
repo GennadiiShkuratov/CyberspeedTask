@@ -5,16 +5,16 @@ import com.cyberspeed.game.bonus.Bonus;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import static com.cyberspeed.game.bonus.GameImpact.MISS_GAME;
-import static com.cyberspeed.game.bonus.GameImpact.INCREASE_REWARD;
 import static com.cyberspeed.game.Utils.round;
+import static com.cyberspeed.game.bonus.GameImpact.INCREASE_REWARD;
+import static com.cyberspeed.game.bonus.GameImpact.MISS_GAME;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.requireNonNull;
 
 public class ExtraBonusSymbol implements BonusSymbol {
 
     private final String name;
-    private BigDecimal value;
+    private final BigDecimal value;
 
     public ExtraBonusSymbol(String name, BigDecimal value) {
         this.name = requireNonNull(name).toUpperCase();
@@ -36,7 +36,7 @@ public class ExtraBonusSymbol implements BonusSymbol {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 

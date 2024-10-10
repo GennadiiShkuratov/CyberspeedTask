@@ -2,9 +2,9 @@ package com.cyberspeed.game;
 
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.symbol.*;
-import com.cyberspeed.game.winCombination.LinearSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.SameSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.wincombination.LinearSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.SameSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.WinCombination;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,63 +17,62 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RewardTest {
 
     @Test
-    public void bettingAmountIsMandatory() {
+    void bettingAmountIsMandatory() {
+        Reward.Builder builder1 = Reward.builder()
+                .setMatrix(new String[][]{
+                        new String[]{"A", "A", "B"},
+                        new String[]{"A", "C", "B"},
+                        new String[]{"A", "A", "B"},
+                })
+                .setBettingAmount(null)
+                .setBonusSymbols(Collections.emptyList())
+                .setWinCombinations(Collections.emptyMap());
+
         assertThrows(NullPointerException.class,
-                () -> Reward.builder()
-                        .setMatrix(new String[][]{
-                                new String[]{"A", "A", "B"},
-                                new String[]{"A", "C", "B"},
-                                new String[]{"A", "A", "B"},
-                        })
-                        .setBettingAmount(null)
-                        .setBonusSymbols(Collections.emptyList())
-                        .setWinCombinations(Collections.emptyMap())
-                        .build()
+                builder1::build
         );
 
+        Reward.Builder builder2 = Reward.builder()
+                .setMatrix(new String[][]{
+                        new String[]{"A", "A", "B"},
+                        new String[]{"A", "C", "B"},
+                        new String[]{"A", "A", "B"},
+                })
+                .setBettingAmount(BigDecimal.ZERO)
+                .setBonusSymbols(Collections.emptyList())
+                .setWinCombinations(Collections.emptyMap());
         assertThrows(IllegalArgumentException.class,
-                () -> Reward.builder()
-                        .setMatrix(new String[][]{
-                                new String[]{"A", "A", "B"},
-                                new String[]{"A", "C", "B"},
-                                new String[]{"A", "A", "B"},
-                        })
-                        .setBettingAmount(BigDecimal.ZERO)
-                        .setBonusSymbols(Collections.emptyList())
-                        .setWinCombinations(Collections.emptyMap())
-                        .build()
+                builder2::build
         );
 
+        Reward.Builder builder3 = Reward.builder()
+                .setMatrix(new String[][]{
+                        new String[]{"A", "A", "B"},
+                        new String[]{"A", "C", "B"},
+                        new String[]{"A", "A", "B"},
+                })
+                .setBettingAmount(new BigDecimal(100).negate())
+                .setBonusSymbols(Collections.emptyList())
+                .setWinCombinations(Collections.emptyMap());
+
         assertThrows(IllegalArgumentException.class,
-                () ->
-                        Reward.builder()
-                                .setMatrix(new String[][]{
-                                        new String[]{"A", "A", "B"},
-                                        new String[]{"A", "C", "B"},
-                                        new String[]{"A", "A", "B"},
-                                })
-                                .setBettingAmount(new BigDecimal(100).negate())
-                                .setBonusSymbols(Collections.emptyList())
-                                .setWinCombinations(Collections.emptyMap())
-                                .build()
-        );
+                builder3::build);
     }
 
     @Test
-    public void nonEmptyMatrixIsMandatory(){
+    void nonEmptyMatrixIsMandatory(){
+        Reward.Builder builder = Reward.builder()
+                .setMatrix(new String[0][0])
+                .setBettingAmount(ONE)
+                .setBonusSymbols(Collections.emptyList())
+                .setWinCombinations(Collections.emptyMap());
+
         assertThrows(IllegalArgumentException.class,
-                ()->{
-                    Reward.builder()
-                            .setMatrix(new String[0][0])
-                            .setBettingAmount(ONE)
-                            .setBonusSymbols(Collections.emptyList())
-                            .setWinCombinations(Collections.emptyMap())
-                            .build();
-                });
+                builder::build);
     }
 
     @Test
-    public void calculateTotalRewardConsideringAllWinningCombinations(){
+    void calculateTotalRewardConsideringAllWinningCombinations(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "B"},
@@ -121,7 +120,7 @@ class RewardTest {
     }
 
     @Test
-    public void calculateTotalRewardConsideringAllMultiplierBonuses(){
+    void calculateTotalRewardConsideringAllMultiplierBonuses(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "x10"},
@@ -157,7 +156,7 @@ class RewardTest {
     }
 
     @Test
-    public void calculateTotalRewardConsideringAllExtraBonuses(){
+    void calculateTotalRewardConsideringAllExtraBonuses(){
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "+5000"},
@@ -195,7 +194,7 @@ class RewardTest {
 
 
     @Test
-    public void calculateTotalShouldBeZeroWhenThereIsMissBonusSymbol() {
+    void calculateTotalShouldBeZeroWhenThereIsMissBonusSymbol() {
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "B"},

@@ -5,9 +5,9 @@ import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.symbol.BonusSymbol;
 import com.cyberspeed.game.symbol.ExtraBonusSymbol;
 import com.cyberspeed.game.symbol.StandardSymbol;
-import com.cyberspeed.game.winCombination.LinearSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.SameSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.wincombination.LinearSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.SameSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.WinCombination;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import static java.math.BigDecimal.ONE;
 class GameResultSerializerTest {
 
     @Test
-    public void serializeResultShouldContainAllAttributes() throws JsonProcessingException {
+    void serializeResultShouldContainAllAttributes() throws JsonProcessingException {
         //Given
         String[][] matrix = new String[][] {
                 new String[]{"A", "A", "B"},
@@ -61,21 +61,23 @@ class GameResultSerializerTest {
                 .setWinCombinations(winCombinations)
                 .build();
 
-        String expectedResult = "{\n" +
-                "    \"matrix\": [\n" +
-                "        [\"A\", \"A\", \"B\"],\n" +
-                "        [\"A\", \"+1000\", \"B\"],\n" +
-                "        [\"A\", \"A\", \"B\"]\n" +
-                "    ],\n" +
-                "    \"reward\": 1800,\n" +
-                "    \"applied_winning_combinations\": {\n" +
-                "        \"A\": [\"same_symbol_5_times\", \"same_symbols_vertically\"],\n" +
-                "        \"B\": [\"same_symbol_3_times\", \"same_symbols_vertically\"]\n" +
-                "    },\n" +
-                "   \"applied_bonus_symbol\": [\n" +
-                "        \"+1000\"\n" +
-                "   ]\n" +
-                "}";
+        String expectedResult = """
+                    {
+                    "matrix": [
+                        ["A", "A", "B"],
+                        ["A", "+1000", "B"],
+                        ["A", "A", "B"]
+                    ],
+                    "reward": 1800,
+                    "applied_winning_combinations": {
+                        "A": ["same_symbol_5_times", "same_symbols_vertically"],
+                        "B": ["same_symbol_3_times", "same_symbols_vertically"]
+                    },
+                   "applied_bonus_symbol": [
+                        "+1000"
+                   ]
+                }
+                """;
 
         //When
         String actualResult = GameResultSerializer.toJson(reward);

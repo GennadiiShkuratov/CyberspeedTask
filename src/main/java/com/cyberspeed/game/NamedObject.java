@@ -2,6 +2,6 @@ package com.cyberspeed.game;
 
 public interface NamedObject {
 
-    String getName();
+    String name();
 
 }

@@ -1,4 +1,4 @@
-package com.cyberspeed.game.winCombination;
+package com.cyberspeed.game.wincombination;
 
 import com.cyberspeed.game.symbol.StandardSymbol;
 

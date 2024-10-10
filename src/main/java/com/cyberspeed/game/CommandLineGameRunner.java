@@ -1,17 +1,16 @@
 package com.cyberspeed.game;
 
-import com.cyberspeed.game.configuration.*;
-import com.cyberspeed.game.matrix.Cell;
+import com.cyberspeed.game.configuration.BasicValidationStrategy;
+import com.cyberspeed.game.configuration.GameConfiguration;
+import com.cyberspeed.game.configuration.GameConfigurationValidationStrategy;
+import com.cyberspeed.game.configuration.SymbolsProbabilityValidationStrategy;
 import com.cyberspeed.game.matrix.DefaultMatrixGenerator;
-import com.cyberspeed.game.probability.SymbolProbability;
 import com.cyberspeed.game.serialization.GameResultSerializer;
-import com.cyberspeed.game.symbol.BonusSymbol;
-import com.cyberspeed.game.symbol.StandardSymbol;
-import com.cyberspeed.game.winCombination.WinCombination;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -28,25 +27,34 @@ public class CommandLineGameRunner {
             String configFilePath = null;
             for (int i = 0; i < args.length; i++) {
                 switch (args[i]) {
-                    case "--config":
-                        configFilePath = args[++i];
-                        break;
-                    case "--betting-amount":
+                    case "--config" -> {
+                        i++;
+                        configFilePath = args[i];
+                    }
+                    case "--betting-amount" -> {
+                        i++;
                         try {
-                            bettingAmount = new BigDecimal(args[++i]);
+                            bettingAmount = new BigDecimal(args[i]);
                         } catch (NumberFormatException e) {
                             System.out.println("Invalid betting amount. Please provide a valid number value.");
                             return;
                         }
-                        break;
-                    default:
+                    }
+                    default -> {
                         System.out.println("Invalid argument: " + args[i]);
                         return;
+                    }
                 }
             }
 
             if(isNull(configFilePath) || isNull(bettingAmount)) {
                 missedArgumentNotification();
+                return;
+            }
+
+            File configFile = new File(configFilePath);
+            if(!configFile.exists()){
+                System.out.printf("File %s does not exist%n".formatted(configFilePath));
                 return;
             }
 
@@ -58,27 +66,19 @@ public class CommandLineGameRunner {
             List<GameConfigurationValidationStrategy> validationStrategies = Arrays.asList(
                     new BasicValidationStrategy(),
                     new SymbolsProbabilityValidationStrategy());
-            GameConfiguration matrixGameConfiguration = GameConfiguration.buildFrom(new File(configFilePath), validationStrategies);
-
-            int columns = matrixGameConfiguration.getColumns();
-            int rows = matrixGameConfiguration.getRows();
-            List<StandardSymbol> standardSymbols = matrixGameConfiguration.getStandardSymbols();
-            List<BonusSymbol> bonusSymbols = matrixGameConfiguration.getBonusSymbols();
-            Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell = matrixGameConfiguration.getSymbolProbabilitiesByCell();
-            List<SymbolProbability> symbolProbabilitiesAcrossMatrix = matrixGameConfiguration.getSymbolProbabilitiesAcrossMatrix();
-            List<WinCombination> winCombinations = matrixGameConfiguration.getWinCombinations();
+            GameConfiguration matrixGameConfiguration = GameConfiguration.buildFrom(configFile, validationStrategies);
 
             DefaultMatrixGenerator matrixGenerator = DefaultMatrixGenerator.builder()
-                    .setColumns(columns)
-                    .setRows(rows)
-                    .setSymbolProbabilitiesByCell(symbolProbabilitiesByCell)
-                    .setSymbolProbabilitiesAcrossMatrix(symbolProbabilitiesAcrossMatrix)
+                    .setColumns(matrixGameConfiguration.getColumns())
+                    .setRows(matrixGameConfiguration.getRows())
+                    .setSymbolProbabilitiesByCell(matrixGameConfiguration.getSymbolProbabilitiesByCell())
+                    .setSymbolProbabilitiesAcrossMatrix(matrixGameConfiguration.getSymbolProbabilitiesAcrossMatrix())
                     .build();
 
             Game game = ScratchGame.builder()
-                    .setStandardSymbols(standardSymbols)
-                    .setBonusSymbols(bonusSymbols)
-                    .setWinCombinations(winCombinations)
+                    .setStandardSymbols(matrixGameConfiguration.getStandardSymbols())
+                    .setBonusSymbols(matrixGameConfiguration.getBonusSymbols())
+                    .setWinCombinations(matrixGameConfiguration.getWinCombinations())
                     .setMatrixGenerator(matrixGenerator)
                     .build();
 
@@ -86,7 +86,7 @@ public class CommandLineGameRunner {
 
             System.out.println(GameResultSerializer.toJson(reward));
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
             System.out.println("Failed to run game. Details: " + e.getMessage());
 
         }
@@ -97,7 +97,7 @@ public class CommandLineGameRunner {
         System.out.println("""
                 Missed one of arguments:
                 config          |   config file which is described top of the document
-                betting amount  |   betting amount  
+                betting amount  |   betting amount
                 Please provide both arguments in next format: --config config.json --betting-amount 100
                 """);
     }

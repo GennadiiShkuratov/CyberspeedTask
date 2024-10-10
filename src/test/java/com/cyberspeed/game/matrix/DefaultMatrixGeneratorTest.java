@@ -1,8 +1,5 @@
 package com.cyberspeed.game.matrix;
 
-import com.cyberspeed.game.configuration.GameConfiguration;
-import com.cyberspeed.game.configuration.GameConfigurationValidationException;
-import com.cyberspeed.game.configuration.SymbolsProbabilityValidationStrategy;
 import com.cyberspeed.game.probability.SymbolProbability;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,9 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DefaultMatrixGeneratorTest {
 
-
     @Test
-    public void weightOfSymbolProbabilityShouldReflectItsConfiguration(){
+    void weightOfSymbolProbabilityShouldReflectItsConfiguration(){
         //Given
         Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell = getSymbolProbabilitiesByCell();
         List<SymbolProbability> symbolProbabilitiesAcrossMatrix = getSymbolProbabilitiesAcrossMatrix();
@@ -48,14 +44,14 @@ class DefaultMatrixGeneratorTest {
 
             Assertions.assertEquals(sortedSymbolProbabilitiesByProbability.size(), symbolsOrderedByWeight.size());
             for (int i = 0; i < sortedSymbolProbabilitiesByProbability.size(); i++) {
-                Assertions.assertTrue(sortedSymbolProbabilitiesByProbability.get(i).getSymbolName().equals(symbolsOrderedByWeight.get(i)));
+                Assertions.assertEquals(sortedSymbolProbabilitiesByProbability.get(i).getSymbolName(), symbolsOrderedByWeight.get(i));
             }
 
         }
     }
 
     @Test
-    public void missedSymbolProbabilityConfigurationForCell(){
+    void missedSymbolProbabilityConfigurationForCell(){
         //Given
         Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell = getSymbolProbabilitiesByCell().entrySet().stream()
                 .filter(v -> !v.getKey().equals(new Cell(1,1)))
@@ -66,12 +62,13 @@ class DefaultMatrixGeneratorTest {
         int columns = 5;
 
         //Then
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> DefaultMatrixGenerator.builder()
+        DefaultMatrixGenerator.Builder builder = DefaultMatrixGenerator.builder()
                 .setRows(rows)
                 .setColumns(columns)
                 .setSymbolProbabilitiesAcrossMatrix(symbolProbabilitiesAcrossMatrix)
-                .setSymbolProbabilitiesByCell(symbolProbabilitiesByCell)
-                .build());
+                .setSymbolProbabilitiesByCell(symbolProbabilitiesByCell);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, builder::build);
 
         String expectedMessage = "There are missed standard symbol probability configuration for cell 1:1";
         String actualMessage = exception.getMessage();

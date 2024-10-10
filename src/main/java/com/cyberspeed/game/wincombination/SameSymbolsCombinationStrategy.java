@@ -1,4 +1,4 @@
-package com.cyberspeed.game.winCombination;
+package com.cyberspeed.game.wincombination;
 
 import com.cyberspeed.game.symbol.StandardSymbol;
 
@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class SameSymbolsCombinationStrategy implements WinCombinationStrategy {
 
-    private int count;
+    private final int count;
 
     public SameSymbolsCombinationStrategy(int count) {
         this.count = count;
@@ -15,9 +15,9 @@ public class SameSymbolsCombinationStrategy implements WinCombinationStrategy {
     @Override
     public boolean isApplicable(StandardSymbol standardSymbol, String[][] matrix) {
         int symbolsCount = 0;
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                if (standardSymbol.getName().equalsIgnoreCase(matrix[i][j])) symbolsCount++;
+        for (String[] matrixRow : matrix) {
+            for (int j = 0; j < matrixRow.length; j++) {
+                if (standardSymbol.name().equalsIgnoreCase(matrixRow[j])) symbolsCount++;
                 if (symbolsCount >= count) return true;
             }
         }

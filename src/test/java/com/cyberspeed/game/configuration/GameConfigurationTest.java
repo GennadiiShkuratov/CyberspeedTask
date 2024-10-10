@@ -1,16 +1,13 @@
 package com.cyberspeed.game.configuration;
 
-import com.cyberspeed.game.PredefinedTestingGameConfigurationDataProvider;
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.probability.SymbolProbability;
-import com.cyberspeed.game.symbol.*;
-import com.cyberspeed.game.winCombination.LinearSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.SameSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.WinCombination;
+import com.cyberspeed.game.symbol.BonusSymbol;
+import com.cyberspeed.game.symbol.StandardSymbol;
+import com.cyberspeed.game.wincombination.WinCombination;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -19,20 +16,20 @@ import java.util.*;
 import static com.cyberspeed.game.PredefinedTestingGameConfigurationDataProvider.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GameConfigurationTest {
 
     @Test
-    public void missedProbabilitiesForCell() throws URISyntaxException {
+    void missedProbabilitiesForCell() throws URISyntaxException {
         //Given
         URL resource = getClass().getClassLoader().getResource("json/missed_probabilities_in_config.json");
         File configFile = Paths.get(resource.toURI()).toFile();
 
         //When
-        Exception exception = assertThrows(GameConfigurationValidationException.class, () -> {
-            GameConfiguration.buildFrom(configFile, Arrays.asList(new SymbolsProbabilityValidationStrategy()));
-        });
+        Exception exception = assertThrows(GameConfigurationValidationException.class, () ->
+            GameConfiguration.buildFrom(configFile, List.of(new SymbolsProbabilityValidationStrategy())));
 
         String expectedMessage = "There are missed standard symbol probability configuration for cell 0:3";
         String actualMessage = exception.getMessage();
@@ -42,7 +39,7 @@ class GameConfigurationTest {
 
 
     @Test
-    public void extractedCorrectGameProperties() throws GameConfigurationValidationException, URISyntaxException {
+    void extractedCorrectGameProperties() throws GameConfigurationValidationException, URISyntaxException {
         //Given
         URL resource = getClass().getClassLoader().getResource("json/config.json");
         File configFile = Paths.get(resource.toURI()).toFile();

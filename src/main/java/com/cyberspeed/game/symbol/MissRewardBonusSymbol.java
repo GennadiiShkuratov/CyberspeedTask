@@ -4,8 +4,6 @@ import com.cyberspeed.game.bonus.Bonus;
 
 public class MissRewardBonusSymbol implements BonusSymbol {
 
-    public MissRewardBonusSymbol() {}
-
     @Override
     public Bonus applyTo(Bonus bonus) {
         return Bonus.emptyBonus();
@@ -18,7 +16,7 @@ public class MissRewardBonusSymbol implements BonusSymbol {
 
 
     @Override
-    public String getName() {
+    public String name() {
         return "MISS";
     }
 
@@ -26,9 +24,7 @@ public class MissRewardBonusSymbol implements BonusSymbol {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        return true;
+        return obj != null && getClass() == obj.getClass();
     }
 
     @Override

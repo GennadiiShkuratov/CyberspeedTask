@@ -8,8 +8,8 @@ import static java.util.Objects.requireNonNull;
 
 public class DefaultMatrixGenerator implements MatrixGenerator {
 
-    final private int columns;
-    final private int rows;
+    private final int columns;
+    private final int rows;
 
     final Map<Cell, TreeMap<Long, String>> symbolProbabilityWeightByCell;
 
@@ -23,6 +23,12 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
         this.columns = columns;
         this.rows = rows;
 
+        validate(columns, rows, symbolProbabilitiesByCell, symbolProbabilitiesAcrossMatrix);
+        symbolProbabilityWeightByCell = buildSymbolProbabilityWeightByCellDetails(columns, rows, symbolProbabilitiesByCell, symbolProbabilitiesAcrossMatrix);
+
+    }
+
+    private void validate(int columns, int rows, Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell, List<SymbolProbability> symbolProbabilitiesAcrossMatrix) {
         requireNonNull(symbolProbabilitiesByCell);
         if(symbolProbabilitiesByCell.isEmpty()) {
             throw new IllegalArgumentException("symbolProbabilitiesByCell can't be empty");
@@ -38,13 +44,13 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
             }
         }
 
-        //TODO impl
-
-       requireNonNull(symbolProbabilitiesAcrossMatrix);
+        requireNonNull(symbolProbabilitiesAcrossMatrix);
         if(symbolProbabilitiesAcrossMatrix.isEmpty()) {
             throw new IllegalArgumentException("symbolProbabilitiesAcrossMatrix can't be empty");
         }
+    }
 
+    private Map<Cell, TreeMap<Long, String>> buildSymbolProbabilityWeightByCellDetails(int columns, int rows, Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell, List<SymbolProbability> symbolProbabilitiesAcrossMatrix) {
         Map<Cell, TreeMap<Long, String>> symbolProbabilityAcrossByCell = new HashMap<>();
 
         for (Map.Entry<Cell, List<SymbolProbability>> symbolProbabilitiesByCellEntry : symbolProbabilitiesByCell.entrySet()) {
@@ -66,8 +72,7 @@ public class DefaultMatrixGenerator implements MatrixGenerator {
             symbolProbabilityAcrossByCell.put(symbolProbabilitiesByCellEntry.getKey(), symbolByProbability);
         }
 
-        this.symbolProbabilityWeightByCell = Collections.unmodifiableMap(symbolProbabilityAcrossByCell);
-
+        return Collections.unmodifiableMap(symbolProbabilityAcrossByCell);
     }
 
     public String[][] generateMatrix() {

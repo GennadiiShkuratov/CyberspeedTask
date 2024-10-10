@@ -3,10 +3,10 @@ package com.cyberspeed.game.configuration;
 import com.cyberspeed.game.matrix.Cell;
 import com.cyberspeed.game.probability.SymbolProbability;
 import com.cyberspeed.game.symbol.*;
-import com.cyberspeed.game.winCombination.LinearSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.SameSymbolsCombinationStrategy;
-import com.cyberspeed.game.winCombination.WinCombination;
-import com.cyberspeed.game.winCombination.WinCombinationStrategy;
+import com.cyberspeed.game.wincombination.LinearSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.SameSymbolsCombinationStrategy;
+import com.cyberspeed.game.wincombination.WinCombination;
+import com.cyberspeed.game.wincombination.WinCombinationStrategy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,13 +24,13 @@ import static java.util.Objects.requireNonNull;
 
 public class GameConfiguration {
 
-    final private int columns;
-    final private int rows;
-    final private List<StandardSymbol> standardSymbols;
-    final private List<BonusSymbol> bonusSymbols;
-    final private List<WinCombination> winCombinations;
-    final private Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell;
-    final private List<SymbolProbability> symbolProbabilitiesAcrossMatrix;
+    private final int columns;
+    private final int rows;
+    private final List<StandardSymbol> standardSymbols;
+    private final List<BonusSymbol> bonusSymbols;
+    private final List<WinCombination> winCombinations;
+    private final Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell;
+    private final List<SymbolProbability> symbolProbabilitiesAcrossMatrix;
 
     private GameConfiguration(int columns,
                               int rows,
@@ -119,7 +119,6 @@ public class GameConfiguration {
     }
 
 
-
     private static Map<Cell, List<SymbolProbability>> extractSymbolProbabilitiesByCell(JsonNode rootNode) {
         Map<Cell, List<SymbolProbability>> symbolProbabilitiesByCell = new HashMap<>();
         JsonNode standardSymbolsNode = rootNode.path("probabilities").path("standard_symbols");
@@ -172,25 +171,24 @@ public class GameConfiguration {
         String when = winCombinationNode.path("when").asText();
         String group = winCombinationNode.path("group").asText();
 
-        WinCombinationStrategy strategy;
-        switch (entry.getValue().path("group").asText()) {
-            case "same_symbols":
-                int count = winCombinationNode.path("count").asInt();
-                strategy = new SameSymbolsCombinationStrategy(count);
-                break;
-            case "horizontally_linear_symbols":
-            case "vertically_linear_symbols":
-            case "ltr_diagonally_linear_symbols":
-            case "rtl_diagonally_linear_symbols":
-                Cell[][] coveredArea = getCoveredAreas(winCombinationNode.path("covered_areas"));
-                strategy = new LinearSymbolsCombinationStrategy(coveredArea);
-                break;
-            default:
-                throw new RuntimeException("Configuration file contains unknown impact type for bonus symbol: " + entry.getKey());
-        }
+        WinCombinationStrategy strategy =
+            switch (entry.getValue().path("group").asText()) {
+                case "same_symbols" -> {
+                    int count = winCombinationNode.path("count").asInt();
+                    yield new SameSymbolsCombinationStrategy(count);
+                }
+                case "horizontally_linear_symbols",
+                     "vertically_linear_symbols",
+                     "ltr_diagonally_linear_symbols",
+                     "rtl_diagonally_linear_symbols" -> {
+                    Cell[][] coveredArea = getCoveredAreas(winCombinationNode.path("covered_areas"));
+                    yield new LinearSymbolsCombinationStrategy(coveredArea);
+                }
+                default ->
+                        throw new RuntimeException("Configuration file contains unknown impact type for bonus symbol: " + entry.getKey());
+            };
 
-        WinCombination winCombination = new WinCombination(name, when, multiplier, group, strategy);
-        return winCombination;
+        return new WinCombination(name, when, multiplier, group, strategy);
     }
 
     private static Cell[][] getCoveredAreas(JsonNode coveredAreaNode) {
@@ -240,26 +238,17 @@ public class GameConfiguration {
     }
 
     private static BonusSymbol extractBonusSymbol(Map.Entry<String, JsonNode> entry) {
-        BonusSymbol bonusSymbol;
-        switch (entry.getValue().path("impact").asText()) {
-            case "multiply_reward":
-                bonusSymbol = new MultiplyRewardBonusSymbol(
-                        entry.getKey(),
-                        BigDecimal.valueOf(entry.getValue().path("reward_multiplier").asDouble()));
-                break;
-            case "extra_bonus":
-                bonusSymbol = new ExtraBonusSymbol(
-                        entry.getKey(),
-                        BigDecimal.valueOf(entry.getValue().path("extra").asDouble()));
-                break;
-            case "miss":
-                bonusSymbol = new MissRewardBonusSymbol();
-                break;
-            default:
-                throw new RuntimeException("Configuration file contains unknown impact type for bonus symbol: " + entry.getKey());
-        }
-
-        return bonusSymbol;
+        return switch (entry.getValue().path("impact").asText()) {
+            case "multiply_reward" -> new MultiplyRewardBonusSymbol(
+                    entry.getKey(),
+                    BigDecimal.valueOf(entry.getValue().path("reward_multiplier").asDouble()));
+            case "extra_bonus" -> new ExtraBonusSymbol(
+                    entry.getKey(),
+                    BigDecimal.valueOf(entry.getValue().path("extra").asDouble()));
+            case "miss" -> new MissRewardBonusSymbol();
+            default ->
+                    throw new RuntimeException("Configuration file contains unknown impact type for bonus symbol: " + entry.getKey());
+        };
     }
 
 

@@ -2,7 +2,7 @@ package com.cyberspeed.game.matrix;
 
 import java.util.Objects;
 
-final public class Cell {
+public final class Cell {
     public final int rowIndex;
     public final int columnIndex;
 
